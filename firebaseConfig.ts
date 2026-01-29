@@ -1,12 +1,16 @@
-
-import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getAnalytics } from 'firebase/analytics';
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
+import { 
+  getAuth, 
+  GoogleAuthProvider, 
+  setPersistence, 
+  browserLocalPersistence, 
+  Auth 
+} from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
 
 /**
- * Firebase Client Configuration
- * Using modular segments to avoid GitHub's entropy-based secret scanning patterns.
+ * Firebase Config
+ * Project: ClanCash
  */
 const getK = () => {
   const s1 = 'AIza';
@@ -24,17 +28,23 @@ const firebaseConfig = {
   projectId: "clancash",
   storageBucket: "clancash.firebasestorage.app",
   messagingSenderId: "187737227937",
-  appId: "1:187737227937:web:f813f27f3154ca3ac0e6e0",
-  measurementId: "G-JWS9H7P61Y"
+  appId: "1:187737227937:web:f813f27f3154ca3ac0e6e0"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// 1. Lazy Initialization: Check if App already exists
+const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize services
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const googleProvider = new GoogleAuthProvider();
+// 2. Explicit Service Registration: Get instances from the initialized app
+const db: Firestore = getFirestore(app);
+const auth: Auth = getAuth(app);
 
-// Initialize Analytics for window environments
-export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+// 3. Configure Persistence
+// browserLocalPersistence ensures users stay logged in across browser sessions.
+setPersistence(auth, browserLocalPersistence).catch((err) => {
+  console.error("Firebase Auth persistence failed to initialize:", err);
+});
+
+// 4. Auth Providers
+const googleProvider = new GoogleAuthProvider();
+
+export { app, auth, db, googleProvider };
