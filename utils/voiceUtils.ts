@@ -5,29 +5,37 @@ interface ParsedExpense {
   name: string;
   price: number;
   category: string;
+  paymentMethod?: string;
+  notes?: string;
 }
 
 /**
  * Parses a voice command using Gemini AI.
- * Handles variations like 'Add Netflix 15.99 to Entertainment' or more natural language.
- * Uses structured output (JSON) for reliable parsing.
+ * Handles complex variations like 'Add $45 for gas at Shell using my Credit Card for the road trip'.
  */
 export const parseVoiceCommand = async (text: string): Promise<ParsedExpense | null> => {
   if (!text) return null;
 
-  // Initialize the Gemini API client right before making an API call to ensure it uses the current API key
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   try {
-    // Use gemini-3-flash-preview for efficient text parsing and extraction
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: {
         parts: [{
-          text: `Parse this financial command into structured data: "${text}". 
-          Extract the item name, the numerical price, and the most relevant category.
-          Available categories: Housing, Groceries, Utilities, Entertainment, Transport, Other.
-          If the category is not specified or doesn't fit, map it to 'Other'.`
+          text: `You are a financial data extractor. Parse the following voice command: "${text}".
+          
+          Extract the following information:
+          1. item_name: The primary product or service purchased.
+          2. amount: The numerical cost.
+          3. category: Choose the most relevant from [Housing, Groceries, Utilities, Entertainment, Transport, Other].
+          4. payment_method: If mentioned, extract how it was paid (e.g., Apple Pay, Debit Card, Visa, Cash).
+          5. notes: Any additional context or reason for the expense (e.g., 'birthday gift', 'monthly subscription').
+          
+          Rules:
+          - If multiple items are mentioned, pick the most significant one.
+          - If category is ambiguous, use 'Other'.
+          - If payment_method or notes aren't present, return null for those fields.`
         }]
       },
       config: {
@@ -35,31 +43,25 @@ export const parseVoiceCommand = async (text: string): Promise<ParsedExpense | n
         responseSchema: {
           type: Type.OBJECT,
           properties: {
-            name: {
-              type: Type.STRING,
-              description: 'The name of the item or service.',
-            },
-            price: {
-              type: Type.NUMBER,
-              description: 'The numerical amount spent.',
-            },
-            category: {
-              type: Type.STRING,
-              description: 'Must be one of: Housing, Groceries, Utilities, Entertainment, Transport, Other.',
-            },
+            item_name: { type: Type.STRING },
+            amount: { type: Type.NUMBER },
+            category: { type: Type.STRING },
+            payment_method: { type: Type.STRING, nullable: true },
+            notes: { type: Type.STRING, nullable: true },
           },
-          required: ["name", "price", "category"],
+          required: ["item_name", "amount", "category"],
         },
       },
     });
 
-    // Extract text directly from the response object as per Gemini SDK guidelines
     const result = JSON.parse(response.text || '{}');
     
     return {
-      name: result.name || 'Unknown Item',
-      price: typeof result.price === 'number' ? result.price : 0,
-      category: result.category || 'Other'
+      name: result.item_name || 'Unknown Item',
+      price: typeof result.amount === 'number' ? result.amount : 0,
+      category: result.category || 'Other',
+      paymentMethod: result.payment_method || undefined,
+      notes: result.notes || undefined
     };
   } catch (error) {
     console.error("Gemini Parsing Error:", error);

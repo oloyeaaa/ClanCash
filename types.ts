@@ -11,6 +11,8 @@ export interface ExpenseItem {
   createdBy: string; // Individual user ID
   creatorName: string; // Individual user display name
   createdAt: Timestamp | Date;
+  paymentMethod?: string; // e.g., 'Amex', 'Cash', 'Apple Pay'
+  notes?: string; // e.g., 'Gift for Sarah', 'Business lunch'
 }
 
 export interface UserProfile {

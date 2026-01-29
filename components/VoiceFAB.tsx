@@ -15,7 +15,7 @@ const VoiceFAB: React.FC<VoiceFABProps> = ({ profile, user }) => {
   const [status, setStatus] = useState('');
 
   const handleVoice = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechRecognition) {
       alert("Voice Recognition not supported in this browser.");
       return;
@@ -40,7 +40,9 @@ const VoiceFAB: React.FC<VoiceFABProps> = ({ profile, user }) => {
           direct_debit_date: new Date(),
           familyId: profile.familyId,
           createdBy: user.uid,
-          creatorName: profile.displayName || 'Member'
+          creatorName: profile.displayName || 'Member',
+          paymentMethod: parsed.paymentMethod,
+          notes: parsed.notes
         });
         setStatus('Saved!');
         setTimeout(() => setStatus(''), 2000);
@@ -51,7 +53,8 @@ const VoiceFAB: React.FC<VoiceFABProps> = ({ profile, user }) => {
       setIsListening(false);
     };
 
-    recognition.onerror = () => {
+    recognition.onerror = (event: any) => {
+      console.error("Speech Recognition Error:", event.error);
       setIsListening(false);
       setStatus('');
     };
