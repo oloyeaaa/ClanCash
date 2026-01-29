@@ -29,7 +29,7 @@ const Navigation: React.FC = () => {
         <Link 
           key={link.path}
           to={link.path}
-          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${location.pathname === link.path ? 'nav-active' : 'text-white/40 hover:text-white hover:bg-white/5'}`}
+          className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${location.pathname === link.path ? 'nav-active' : 'text-slate-400 dark:text-white/40 hover:text-brand hover:bg-brand/5'}`}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">{link.icon}</svg>
           <span className="text-[10px] font-black uppercase tracking-widest">{link.label}</span>
@@ -46,6 +46,18 @@ const App: React.FC = () => {
   const [showLanding, setShowLanding] = useState(true);
   const [expenses, setExpenses] = useState<ExpenseItem[]>([]);
   const [members, setMembers] = useState<UserProfile[]>([]);
+  const [isDarkMode, setIsDarkMode] = useState(() => localStorage.getItem('theme') !== 'light');
+
+  // Handle theme persistence
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
 
   // Safety timeout for loading state
   useEffect(() => {
@@ -99,7 +111,7 @@ const App: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#050a08]">
+      <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)]">
         <div className="flex flex-col items-center gap-6">
           <div className="relative">
              <div className="w-16 h-16 border-4 border-emerald-500/10 rounded-full"></div>
@@ -119,11 +131,11 @@ const App: React.FC = () => {
   // Handle logged in but no profile (setup phase)
   if (!user || !profile) {
     return (
-      <div className="min-h-screen relative bg-[#050a08]">
+      <div className="min-h-screen relative bg-[var(--bg-primary)]">
         {!user && (
           <button 
             onClick={() => setShowLanding(true)}
-            className="absolute top-8 left-8 z-20 glass p-3 rounded-xl text-emerald-500 hover:bg-white/10 transition-all group"
+            className="absolute top-8 left-8 z-20 glass p-3 rounded-xl text-emerald-500 hover:bg-emerald-500/10 transition-all group"
           >
             <svg className="w-6 h-6 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -137,7 +149,7 @@ const App: React.FC = () => {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-[#050a08] text-white selection:bg-emerald-500/30 pb-32">
+      <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-300 selection:bg-emerald-500/30 pb-32">
         <header className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
           <Link to="/" className="flex items-center gap-3 group">
              <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500/20 transition-all">
@@ -148,7 +160,7 @@ const App: React.FC = () => {
              <span className="text-xl font-black tracking-tighter">ClanCash</span>
           </Link>
           <div className="flex items-center gap-4">
-            <button onClick={() => signOut(auth)} className="text-[10px] font-black uppercase tracking-widest text-white/30 hover:text-white transition-colors">Sign Out</button>
+            <button onClick={() => signOut(auth)} className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/30 hover:text-brand transition-colors">Sign Out</button>
             <img 
               src={profile.photoURL || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.uid}`} 
               className="w-10 h-10 rounded-full border border-emerald-500/30 object-cover" 
@@ -163,7 +175,7 @@ const App: React.FC = () => {
             <Route path="/bills" element={<BillsPage expenses={expenses} members={members} />} />
             <Route path="/analytics" element={<AnalyticsPage expenses={expenses} />} />
             <Route path="/family" element={<FamilyPage profile={profile} members={members} />} />
-            <Route path="/settings" element={<SettingsPage profile={profile} />} />
+            <Route path="/settings" element={<SettingsPage profile={profile} isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </main>
