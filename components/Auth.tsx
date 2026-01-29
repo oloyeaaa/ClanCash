@@ -9,7 +9,7 @@ import {
   sendEmailVerification, 
   signOut 
 } from 'firebase/auth';
-import { auth, googleProvider } from '../firebaseConfig';
+import { auth, googleProvider } from '../firebaseConfig.ts';
 
 const Auth: React.FC = () => {
   const [isLogin, setIsLogin] = useState(true);

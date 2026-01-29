@@ -10,8 +10,8 @@ import {
   deleteDoc,
   doc
 } from 'firebase/firestore';
-import { db } from '../firebaseConfig';
-import { ExpenseItem } from '../types';
+import { db } from '../firebaseConfig.ts';
+import { ExpenseItem } from '../types.ts';
 
 const EXPENSES_COLLECTION = 'expenses';
 

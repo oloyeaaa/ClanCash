@@ -2,10 +2,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 // Correctly import signOut function and User type from firebase/auth
 import { type User, signOut } from 'firebase/auth';
-import { auth } from '../firebaseConfig';
-import { subscribeToExpenses, addExpense, deleteExpense } from '../services/expenseService';
-import { ExpenseItem, ExpenseCategory } from '../types';
-import { parseVoiceCommand } from '../utils/voiceUtils';
+import { auth } from '../firebaseConfig.ts';
+import { subscribeToExpenses, addExpense, deleteExpense } from '../services/expenseService.ts';
+import { ExpenseItem, ExpenseCategory } from '../types.ts';
+import { parseVoiceCommand } from '../utils/voiceUtils.ts';
 import { 
   PieChart, Pie, Cell, ResponsiveContainer, Tooltip, 
   BarChart, Bar, XAxis, YAxis 

@@ -2,10 +2,10 @@
 import React, { useState, useEffect } from 'react';
 // Correctly import onAuthStateChanged function and User type from firebase/auth
 import { onAuthStateChanged, type User } from 'firebase/auth';
-import { auth } from './firebaseConfig';
-import Auth from './components/Auth';
-import Dashboard from './components/Dashboard';
-import LandingPage from './components/LandingPage';
+import { auth } from './firebaseConfig.ts';
+import Auth from './components/Auth.tsx';
+import Dashboard from './components/Dashboard.tsx';
+import LandingPage from './components/LandingPage.tsx';
 
 const App: React.FC = () => {
   // Use User type directly from modular firebase/auth
