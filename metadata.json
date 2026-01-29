@@ -1,0 +1,7 @@
+{
+  "name": "ClanCash.",
+  "description": "A family finance tracking application with voice integration, spending analytics, and direct debit reminders, featuring a sleek glassmorphic design.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
